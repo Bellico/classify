@@ -1,0 +1,24 @@
+{
+  "name": "classify",
+  "version": "1.0.0",
+  "scripts": {
+    "client": "cd client && npm start",
+    "build-client": "cd client && npm run build",
+    "server": "cd server && npm start",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "concurrently \"npm run server\" \"npm run build-client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bellico/classify.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bellico/classify/issues"
+  },
+  "homepage": "https://github.com/Bellico/classify#readme",
+  "dependencies": {
+    "concurrently": "^5.1.0"
+  }
+}
