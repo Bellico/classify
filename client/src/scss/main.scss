@@ -1,6 +1,26 @@
 
 body{
-    background-color: #282c34;
+    background-color: #3b3c4b;
     margin: 0;
     padding: 0;
+    color: #fff;
+}
+
+.home{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container{
+    width: 50%;
+}
+
+.app-logo{
+    margin: 0 auto;
+    display: block;
+    width: 20em;
+    margin-bottom: 5em;
 }
