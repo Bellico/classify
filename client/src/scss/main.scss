@@ -12,15 +12,57 @@ body{
     justify-content: center;
     align-items: center;
     height: 100vh;
+
+    .app-logo{
+        margin: 0 auto;
+        display: block;
+        width: 20em;
+        margin-bottom: 5em;
+    }
+
+    .container{
+        width: 50%;
+        margin: auto
+    }
+
+    .input-start{
+        margin-bottom: 6em !important;
+    }
+
+    .start-button{
+        text-align: center;
+    }
+
 }
 
-.container{
-    width: 50%;
-}
 
-.app-logo{
-    margin: 0 auto;
-    display: block;
-    width: 20em;
-    margin-bottom: 5em;
+.working{
+
+    margin: 10em 0;
+
+    .container{
+        width: 70%;
+        margin: auto
+    }
+
+    .header-working{
+        display: flex;
+        align-items: center;
+        background: #19304e36;
+        box-shadow: 0 0 5px #2f2c2c;
+        padding: 1em 0em;
+
+        .app-logo{
+            flex: 1;
+        }
+
+        .path-info{
+            flex: 10;
+
+            strong{
+                color: #ffa115;
+            }
+        }
+    }
+
 }
