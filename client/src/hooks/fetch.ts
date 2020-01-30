@@ -19,21 +19,19 @@ export function useAsyncHook(path: string): [boolean, boolean] {
     const [result, setResult] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    async function fetchBookList() {
-        console.log('paaaht', path);
-
-        setLoading(true);
-        const valid = await checkPath(path);
-        console.log('valid', valid);
-
-        setResult(valid);
-        setLoading(false);
-
-    }
 
 
     useEffect(() => {
 
+        async function fetchBookList() {
+
+            setLoading(true);
+            const valid = await checkPath(path);
+
+            setResult(valid);
+            setLoading(false);
+
+        }
 
         fetchBookList();
 
