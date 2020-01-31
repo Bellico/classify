@@ -1,0 +1,29 @@
+
+.home{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+
+  .app-logo{
+      margin: 0 auto;
+      display: block;
+      width: 20em;
+      margin-bottom: 5em;
+  }
+
+  .container{
+      width: 50%;
+      margin: auto
+  }
+
+  .input-start{
+      margin-bottom: 6em !important;
+  }
+
+  .start-button{
+      text-align: center;
+  }
+  
+}

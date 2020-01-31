@@ -17,7 +17,7 @@ const theme = createMuiTheme({
 
 export const App = () => {
 
-  const [startPath, setStartPath] = useState('d');
+  const [startPath, setStartPath] = useState('');
 
 
   return (
