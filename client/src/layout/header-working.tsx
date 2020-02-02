@@ -17,7 +17,7 @@ export const HeaderWorking: FunctionComponent<{ startPath: string, countFiles: n
                 </Typography>
             </div>
 
-            <Button color="primary" onClick={onBackHome}>Retour à l'accueil</Button>
+            <Button color="primary" onClick={onBackHome}>Retour au choix du dossier</Button>
         </header>
     )
 };

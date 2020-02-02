@@ -36,8 +36,6 @@ router.get('/extensions', async function (req, res) {
         extensions.splice(index, 1);
     }
 
-    await classifyService.sleep(500);
-
     res.json({
         countFiles: files.length,
         extensions
@@ -46,8 +44,6 @@ router.get('/extensions', async function (req, res) {
 
 router.post('/rule', async function (req, res) {
     const resultCheck = classifyService.checkRule(req.body);
-
-    await classifyService.sleep(1000);
 
     if (!resultCheck.success) {
         return res.status(400).json(resultCheck);

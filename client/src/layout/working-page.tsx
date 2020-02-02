@@ -1,8 +1,8 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
+import React, { FunctionComponent } from 'react';
 import { HeaderWorking } from './header-working';
 import { PrimaryActions } from './primary-actions';
 import { RuleCard } from '../components/rule-card';
-import { useGetExtensions as useFetchExtensions, usePostRule } from '../hooks/classify-hooks';
+import { useFetchExtensions, useRulesQueue } from '../hooks/classify-hooks';
 import { LinearProgress } from '@material-ui/core';
 import { RuleCardModel } from '../models/rule-card.model';
 import { ConfirmDialogService } from '../services/confirm-dialog.service';
@@ -10,43 +10,14 @@ import { StorageService } from '../services/storage.service';
 
 export const WorkingPage: FunctionComponent<{ startPath: string, setStartPath: (path: string) => void }> = ({ startPath, setStartPath }) => {
 
-    const [cards, setCards] = useState<RuleCardModel[]>(StorageService.getCards());
     const [resultFetchextensions, extensionsLoading] = useFetchExtensions(startPath);
-    const [resultCardWork, cardWorkingLoading, cardWorking, setCardWorking] = usePostRule(startPath);
-    const [queue, setQueue] = useState<RuleCardModel[]>([]);
-
-    useEffect(() => {
-        if (resultCardWork && resultCardWork.success) {
-            queue.splice(0, 1);
-            setQueue([...queue]);
-        }
-    }, [resultCardWork])
-
-    useEffect(() => {
-        if (cardWorking) {
-            cardWorking.isWorking = cardWorkingLoading
-            cardWorking.isActive = cardWorkingLoading
-            setCards([...cards])
-        }
-    }, [cardWorking, cardWorkingLoading])
-
-    useEffect(() => {
-        if (queue.length > 0) {
-            setCardWorking(queue[0]);
-        } else if (cardWorking) {
-            setCardWorking(null);
-        }
-    }, [queue])
+    const [cards, setCards, setQueue] = useRulesQueue(startPath);
 
     const addCard = () => {
         setCards([
             ...cards,
             new RuleCardModel()
         ]);
-    }
-
-    const backHome = () => {
-        setStartPath('');
     }
 
     const countActiveCards = () => cards.filter(c => c.canApply).length;
@@ -114,7 +85,10 @@ export const WorkingPage: FunctionComponent<{ startPath: string, setStartPath: (
 
                 {resultFetchextensions && (
                     <>
-                        <HeaderWorking startPath={startPath} countFiles={resultFetchextensions.countFiles} onBackHome={backHome} />
+                        <HeaderWorking
+                            startPath={startPath}
+                            countFiles={resultFetchextensions.countFiles}
+                            onBackHome={() => { setStartPath('') }} />
 
                         {cards.map((card, index) =>
                             <RuleCard
@@ -126,7 +100,10 @@ export const WorkingPage: FunctionComponent<{ startPath: string, setStartPath: (
                                 applyRule={applyRuleCard} />
                         )}
 
-                        <PrimaryActions handleAddRule={addCard} handleApplyRules={applyAllRulesCards} countRule={countActiveCards()} />
+                        <PrimaryActions
+                            handleAddRule={addCard}
+                            handleApplyRules={applyAllRulesCards}
+                            countRule={countActiveCards()} />
                     </>
                 )}
             </div>

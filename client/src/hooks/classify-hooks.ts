@@ -1,9 +1,10 @@
 import { useRequest } from './request-helpers';
 import { useState, useEffect } from 'react';
+import { RuleCardModel } from '../models/rule-card.model';
+import { StorageService } from '../services/storage.service';
 
 export function useCheckPath(path: string) {
-
-    const [result, loading, setRequest] = useRequest();
+    const [requestResult, requestLoading, setRequest] = useRequest();
 
     useEffect(() => {
         if (path) {
@@ -13,11 +14,11 @@ export function useCheckPath(path: string) {
         }
     }, [path, setRequest]);
 
-    return [result && result.checked, loading];
+    return [requestResult && requestResult.checked, requestLoading];
 }
 
-export function useGetExtensions(path: string) {
-    const [result, loading, setRequest] = useRequest();
+export function useFetchExtensions(path: string) {
+    const [requestResult, requestLoading, setRequest] = useRequest();
 
     useEffect(() => {
         if (path) {
@@ -27,16 +28,15 @@ export function useGetExtensions(path: string) {
         }
     }, [path, setRequest]);
 
-    return [result, loading];
+    return [requestResult, requestLoading];
 }
 
-export function usePostRule(sourcePath: string) {
-
-    const [cardWorking, setCardWorking] = useState();
-    const [result, loading, setRequest] = useRequest();
+export function useFetchApplyRule(sourcePath: string) {
+    const [ruleToApply, setRuleToApply] = useState();
+    const [requestResult, requestLoading, setRequest] = useRequest();
 
     useEffect(() => {
-        if (cardWorking) {
+        if (ruleToApply) {
             setRequest({
                 uri: 'rule',
                 options: {
@@ -45,22 +45,47 @@ export function usePostRule(sourcePath: string) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        action: cardWorking.actionType,
-                        targetPath: cardWorking.targetPath,
-                        fileTypes: cardWorking.fileTypes,
+                        action: ruleToApply.actionType,
+                        targetPath: ruleToApply.targetPath,
+                        fileTypes: ruleToApply.fileTypes,
                         sourcePath
                     })
                 }
             })
         }
-    }, [cardWorking, sourcePath, setRequest]);
+    }, [ruleToApply, sourcePath, setRequest]);
 
-    // if (cardWorking) {
-    //     cardWorking.isWorking = loading;
-    //     if (result && result.success) {
-    //         cardWorking.isActive = false;
-    //     }
-    // }
+    return [requestResult, requestLoading, ruleToApply, setRuleToApply];
+}
 
-    return [result, loading, cardWorking, setCardWorking];
+export function useRulesQueue(startPath: string): [RuleCardModel[], (cards: RuleCardModel[]) => void, (queue: RuleCardModel[]) => void] {
+
+    const [cards, setCards] = useState<RuleCardModel[]>(StorageService.getCards());
+    const [applyResult, applyLoading, ruleToApply, setRuleToApply] = useFetchApplyRule(startPath);
+    const [queue, setQueue] = useState<RuleCardModel[]>([]);
+
+    useEffect(() => {
+        if (applyResult && applyResult.success) {
+            queue.splice(0, 1);
+            setQueue([...queue]);
+        }
+    }, [applyResult])
+
+    useEffect(() => {
+        if (ruleToApply) {
+            ruleToApply.isWorking = applyLoading
+            ruleToApply.isActive = applyLoading
+            setCards([...cards])
+        }
+    }, [ruleToApply, applyLoading])
+
+    useEffect(() => {
+        if (queue.length > 0) {
+            setRuleToApply(queue[0]);
+        } else if (ruleToApply) {
+            setRuleToApply(null);
+        }
+    }, [queue])
+
+    return [cards, setCards, setQueue];
 }
