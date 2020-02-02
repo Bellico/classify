@@ -55,12 +55,12 @@ export function usePostRule(sourcePath: string) {
         }
     }, [cardWorking, sourcePath, setRequest]);
 
-    if (cardWorking) {
-        cardWorking.isWorking = loading;
-        if (result && result.success) {
-            cardWorking.isActive = false;
-        }
-    }
+    // if (cardWorking) {
+    //     cardWorking.isWorking = loading;
+    //     if (result && result.success) {
+    //         cardWorking.isActive = false;
+    //     }
+    // }
 
-    return [result, setCardWorking];
+    return [result, loading, cardWorking, setCardWorking];
 }

@@ -6,32 +6,36 @@ import { useGetExtensions as useFetchExtensions, usePostRule } from '../hooks/cl
 import { LinearProgress } from '@material-ui/core';
 import { RuleCardModel } from '../models/rule-card.model';
 import { ConfirmDialogService } from '../services/confirm-dialog.service';
-import { getCardsInStorage, saveCardsInStorage } from '../services/storage.service';
-
+import { StorageService } from '../services/storage.service';
 
 export const WorkingPage: FunctionComponent<{ startPath: string, setStartPath: (path: string) => void }> = ({ startPath, setStartPath }) => {
 
-    const [cards, setCards] = useState<RuleCardModel[]>(getCardsInStorage());
+    const [cards, setCards] = useState<RuleCardModel[]>(StorageService.getCards());
     const [resultFetchextensions, extensionsLoading] = useFetchExtensions(startPath);
-    const [resultCardWork, setCardWorking] = usePostRule(startPath);
+    const [resultCardWork, cardWorkingLoading, cardWorking, setCardWorking] = usePostRule(startPath);
     const [queue, setQueue] = useState<RuleCardModel[]>([]);
 
     useEffect(() => {
         if (resultCardWork && resultCardWork.success) {
+            queue.splice(0, 1);
             setQueue([...queue]);
-            setCards([...cards])
         }
     }, [resultCardWork])
 
     useEffect(() => {
-        const cardToWork = queue.shift();
-
-        if (cardToWork) {
-            setCardWorking(cardToWork);
+        if (cardWorking) {
+            cardWorking.isWorking = cardWorkingLoading
+            cardWorking.isActive = cardWorkingLoading
+            setCards([...cards])
         }
+    }, [cardWorking, cardWorkingLoading])
 
-        setCards([...cards]);
-
+    useEffect(() => {
+        if (queue.length > 0) {
+            setCardWorking(queue[0]);
+        } else if (cardWorking) {
+            setCardWorking(null);
+        }
     }, [queue])
 
     const addCard = () => {
@@ -49,7 +53,7 @@ export const WorkingPage: FunctionComponent<{ startPath: string, setStartPath: (
 
     const saveChangesCard = () => {
         setCards([...cards]);
-        saveCardsInStorage(cards);
+        StorageService.saveCards(cards);
     }
 
     const deleteCard = async (card: RuleCardModel) => {
@@ -57,7 +61,7 @@ export const WorkingPage: FunctionComponent<{ startPath: string, setStartPath: (
             const index = cards.indexOf(card);
             cards.splice(index, 1);
             setCards([...cards]);
-            saveCardsInStorage(cards);
+            StorageService.saveCards(cards);
         }
 
         if (!card.hasValue) {

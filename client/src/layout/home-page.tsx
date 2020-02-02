@@ -7,12 +7,12 @@ import Close from '@material-ui/icons/Close';
 import { debounce } from 'lodash-es';
 import Send from '@material-ui/icons/Send';
 import { useCheckPath } from '../hooks/classify-hooks';
-import { getClassifyPathInStorage, saveClassifyPathInStorage } from '../services/storage.service';
+import { StorageService } from '../services/storage.service';
 
 
 export const HomePage: FunctionComponent<{ startWorkingOn: (path: string) => void }> = ({ startWorkingOn }) => {
 
-    const [startPath, setStartPath] = useState(getClassifyPathInStorage());
+    const [startPath, setStartPath] = useState(StorageService.getClassifyPath());
     const [startPathChecked] = useCheckPath(startPath);
 
     const CheckedIcon = () => {
@@ -33,7 +33,7 @@ export const HomePage: FunctionComponent<{ startWorkingOn: (path: string) => voi
 
     const start = () => {
         startWorkingOn(startPath);
-        saveClassifyPathInStorage(startPath);
+        StorageService.saveClassifyPath(startPath);
     }
 
     return (

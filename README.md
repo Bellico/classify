@@ -11,14 +11,14 @@ Client project was bootstrapped with [Create React App](https://github.com/faceb
 #### Or in Server Project
 ### `cd server` , `npm start`
 
-Server project with [Express](https://github.com/expressjs/express) 
+Server project with [Express](https://github.com/expressjs/express)
 
 ## Production
 
  ### Client
 * `cd client`
 * `npm i`
-* `npm build`
+* `npm run build`
 
  ### Server
 * `cd server`
