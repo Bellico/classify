@@ -1,80 +1,66 @@
-import { useRequest, getDataRequest } from './request-helpers';
+import { useRequest } from './request-helpers';
 import { useState, useEffect } from 'react';
 
 export function useCheckPath(path: string) {
-    const uri = `checked-path?sourcePath=${path}`;
-    const [result, loading] = useRequest(uri);
+
+    const [result, loading, setRequest] = useRequest();
+
+    useEffect(() => {
+        if (path) {
+            setRequest({
+                uri: `checked-path?sourcePath=${path}`
+            })
+        }
+    }, [path, setRequest]);
 
     return [result && result.checked, loading];
 }
 
 export function useGetExtensions(path: string) {
-    const uri = `extensions?sourcePath=${path}`;
+    const [result, loading, setRequest] = useRequest();
 
-    return useRequest(uri);
+    useEffect(() => {
+        if (path) {
+            setRequest({
+                uri: `extensions?sourcePath=${path}`
+            })
+        }
+    }, [path, setRequest]);
+
+    return [result, loading];
 }
 
-const baseUrlApi = 'http://localhost:3001/api/'
-
 export function usePostRule(sourcePath: string) {
-    const uri = `rule`;
 
     const [cardWorking, setCardWorking] = useState();
+    const [result, loading, setRequest] = useRequest();
 
     useEffect(() => {
         if (cardWorking) {
-
-            const request = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: cardWorking.actionType,
-                    targetPath: cardWorking.targetPath,
-                    fileTypes: cardWorking.fileTypes,
-                    sourcePath
-                })
-            };
-
-            async function fetchRequest() {
-                const result = await getDataRequest(`${baseUrlApi}${uri}`, request as RequestInit);
-                console.log(result);
-            }
-
-            fetchRequest();
-
-            setCardWorking(null);
+            setRequest({
+                uri: 'rule',
+                options: {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: cardWorking.actionType,
+                        targetPath: cardWorking.targetPath,
+                        fileTypes: cardWorking.fileTypes,
+                        sourcePath
+                    })
+                }
+            })
         }
-    }, [cardWorking, sourcePath, uri]);
+    }, [cardWorking, sourcePath, setRequest]);
 
+    if (cardWorking) {
+        cardWorking.isWorking = loading;
+        if (result && result.success) {
+            cardWorking.isActive = false;
+        }
+    }
 
-    //   const result = useRequest(uri, { method: 'POST', body });
-
-    return [setCardWorking];
+    return [result, setCardWorking];
 }
-
-
-// const usePostRule = () => {
-//     const [data, setData] = useState({ hits: [] });
-//     const [url, setUrl] = useState(
-//         'https://hn.algolia.com/api/v1/search?query=redux',
-//     );
-//     const [isLoading, setIsLoading] = useState(false);
-//     const [isError, setIsError] = useState(false);
-//     useEffect(() => {
-//         const fetchData = async () => {
-//             setIsError(false);
-//             setIsLoading(true);
-//             try {
-//                 const result = await axios(url);
-//                 setData(result.data);
-//             } catch (error) {
-//                 setIsError(true);
-//             }
-//             setIsLoading(false);
-//         };
-//         fetchData();
-//     }, [url]);
-//     return [{ data, isLoading, isError }, setUrl];
-// }

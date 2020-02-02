@@ -2,32 +2,38 @@ import { useState, useEffect } from 'react';
 
 const baseUrlApi = 'http://localhost:3001/api/'
 
-export async function getDataRequest(path: string, request: RequestInit): Promise<any> {
-    const response = await fetch(path, request);
+async function getDataRequest(path: string, request: RequestInit): Promise<any> {
+    const response = await fetch(baseUrlApi + path, request);
 
     return await response.json();
 }
 
-
-export function useRequest(uri: string, request?: RequestInit): [any, boolean] {
-    if (!request) {
-        request = { method: 'GET' }
-    }
+export function useRequest(): [any, boolean, (request: { uri: string, options?: RequestInit }) => void] {
 
     const [result, setResult] = useState();
     const [loading, setLoading] = useState(false);
+    const [request, setRequest] = useState<{ uri: string, options?: RequestInit }>();
 
     useEffect(() => {
-        setLoading(true);
 
         async function fetchRequest() {
-            const result = await getDataRequest(`${baseUrlApi}${uri}`, request as RequestInit);
-            setResult(result);
-            setLoading(false);
+            if (request) {
+                if (!request.options) {
+                    request.options = {
+                        method: 'GET'
+                    }
+                }
+
+                setLoading(true);
+                const result = await getDataRequest(request?.uri, request?.options);
+                setResult(result);
+                setLoading(false);
+            }
         }
 
         fetchRequest();
-    }, [uri]);
 
-    return [result, loading];
+    }, [request]);
+
+    return [result, loading, setRequest];
 }

@@ -33,7 +33,7 @@ export const HomePage: FunctionComponent<{ startWorkingOn: (path: string) => voi
 
     const start = () => {
         startWorkingOn(startPath);
-        localStorage.setItem('pathFolderToClassify', startPath);
+        saveClassifyPathInStorage(startPath);
     }
 
     return (
@@ -58,7 +58,7 @@ export const HomePage: FunctionComponent<{ startWorkingOn: (path: string) => voi
                         }}>
                     </TextField>
 
-                    {startPathChecked &&
+                    {startPath && startPathChecked &&
                         <div className="start-button">
                             <Fade in>
                                 <Button
