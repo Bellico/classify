@@ -3,66 +3,73 @@ const router = express.Router();
 const path = require('path')
 const fs = require('fs');
 
-router.get('/check-path', function (req, res) {
+var classifyService = require('../services/classify-service');
+
+router.get('/checked-path', function (req, res) {
     const sourcePath = req.query.sourcePath;
 
-    if (!sourcePath) {
-        return res.status(400).json('Bad Request: params source path required');
+    const result = classifyService.checkPath(sourcePath);
+
+    if (!result.checked) {
+        return res.status(400).json(result);
     }
 
-    if (!fs.existsSync(sourcePath)) {
-        return res.status(400).json('Bad Request: path invalid');
-    }
-
-    res.end();
+    res.json(result);
 })
 
-router.get('/extensions', function (req, res) {
+router.get('/extensions', async function (req, res) {
     const sourcePath = req.query.sourcePath;
 
-    if (!sourcePath) {
-        return res.status(400).json('Bad Request: params source path required');
+    const result = classifyService.checkPath(sourcePath);
+
+    if (!result.checked) {
+        return res.status(400).json(result);
     }
 
-    if (!fs.existsSync(sourcePath)) {
-        return res.status(400).json('Bad Request: path invalid');
+    const files = fs.readdirSync(sourcePath)
+        .filter(file => !fs.statSync(sourcePath + '\\' + file).isDirectory());
+
+    const extensions = [...new Set(files.map(file => path.extname(file)))].sort();
+    const index = extensions.indexOf("");
+
+    if (index !== -1) {
+        extensions.splice(index, 1);
     }
 
+    await classifyService.sleep(500);
 
-    fs.readdirSync(sourcePath).forEach(d => {
-        console.log(fs.statSync(sourcePath + '\\' + d).isDirectory());
-    })
+    res.json({
+        countFiles: files.length,
+        extensions
+    });
+})
 
-    const extensions = fs.readdirSync(sourcePath)
-        .filter(f => !fs.statSync(sourcePath + '\\' + f).isDirectory())
-        .map(f => path.extname(f));
+router.post('/rule', async function (req, res) {
+    const resultCheck = classifyService.checkRule(req.body);
 
-    res.json(extensions);
+    await classifyService.sleep(1000);
+
+    if (!resultCheck.success) {
+        return res.status(400).json(resultCheck);
+    }
+
+    const { action } = req.body;
+    let resultAction;
+
+    if (action === 'move') {
+        resultAction = classifyService.doMoveAction(req.body)
+    }
+
+    if (action === 'deleted') {
+        resultAction = classifyService.doDeletedAction(req.body)
+    }
+
+    if (!resultAction.success) {
+        res.status(500).json(resultAction);
+    }
+
+    res.json(resultAction);
 })
 
 
 module.exports = router;
-
-
-
-// const sourcePath = `D:\\Downloads\\classify_workspace\\Backgrounds`;
-// const sourcePathFinal = `D:\\Downloads\\classify_workspace\\final`;
-
-// fs.mkdir(sourcePathFinal, { recursive: true }, (err) => {
-//     if (err) throw err;
-// });
-
-// fs.readdir(`D:\\Images\\Backgrounds`, (err, data) => {
-//     console.log(err);
-//     const d = data.filter(f => f.endsWith('.jpg'));
-
-//     //fs.unlink().
-//     d.forEach(d => {
-//         fs.rename(`${sourcePath}\\${d}`, `${sourcePathFinal}\\${d}`, (err) => {
-//             // console.log(err);
-//             // console.log('Rename complete!');
-//         })
-//     });
-
-
-// });

@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import classify from '../classify.svg';
-import { Typography } from '@material-ui/core';
+import { Typography, Button } from '@material-ui/core';
 
-export const HeaderWorking = () => {
+export const HeaderWorking: FunctionComponent<{ startPath: string, countFiles: number, onBackHome: () => void }> = ({ startPath, countFiles, onBackHome }) => {
     return (
         <header className="card header">
             <img src={classify} className="app-logo" alt="classify" />
+
             <div className="path-info">
                 <Typography variant="subtitle1" >
-                    E:\PartageLab\partage-react-client
+                    {startPath}
                 </Typography>
 
                 <Typography variant="subtitle2" color="primary" >
-                    <strong>(336 fichiers)</strong>
+                    <strong>({countFiles} fichier{countFiles > 1 ? 's' : ''})</strong>
                 </Typography>
             </div>
+
+            <Button color="primary" onClick={onBackHome}>Retour à l'accueil</Button>
         </header>
     )
 };

@@ -17,16 +17,15 @@ const theme = createMuiTheme({
 
 export const App = () => {
 
-  const [startPath, setStartPath] = useState('');
-
+  const [startPath, setStartPath] = useState();
 
   return (
     <ThemeProvider theme={theme}>
       <main className="app">
-        {startPath === '' ?
+        {!startPath || startPath === '' ?
           <HomePage startWorkingOn={setStartPath} />
           :
-          <WorkingPage />}
+          <WorkingPage startPath={startPath} setStartPath={setStartPath} />}
       </main>
     </ThemeProvider>
   );

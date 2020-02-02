@@ -1,33 +1,39 @@
 import React, { useState, FunctionComponent } from 'react';
 import classify from '../classify.svg';
 import TextField from '@material-ui/core/TextField';
-import { useAsyncHook } from '../hooks/fetch';
 import { InputAdornment, Button, Fade, Zoom } from '@material-ui/core';
 import Done from '@material-ui/icons/Done';
 import Close from '@material-ui/icons/Close';
 import { debounce } from 'lodash-es';
 import Send from '@material-ui/icons/Send';
+import { useCheckPath } from '../hooks/classify-hooks';
+import { getClassifyPathInStorage, saveClassifyPathInStorage } from '../services/storage.service';
 
-const pathSaved = localStorage.getItem('pathFolderToClassify') || '';
 
 export const HomePage: FunctionComponent<{ startWorkingOn: (path: string) => void }> = ({ startWorkingOn }) => {
 
-    const [startPath, setStartPath] = useState(pathSaved);
-    const [checked] = useAsyncHook(startPath);
+    const [startPath, setStartPath] = useState(getClassifyPathInStorage());
+    const [startPathChecked] = useCheckPath(startPath);
 
     const CheckedIcon = () => {
         if (startPath === '') return null;
 
-        return checked ? <Done color="primary" /> : <Close color="secondary" />
+        return startPathChecked ? <Done color="primary" /> : <Close color="secondary" />
     }
 
     const handleChangeDebounced = debounce((value: string) => {
         setStartPath(value);
     }, 200);
 
-    const onClickStart = () => {
-        localStorage.setItem('pathFolderToClassify', startPath);
+    const handleKeyDown = (event: any) => {
+        if (startPathChecked && event.keyCode === 13) {
+            start();
+        }
+    }
+
+    const start = () => {
         startWorkingOn(startPath);
+        localStorage.setItem('pathFolderToClassify', startPath);
     }
 
     return (
@@ -39,11 +45,12 @@ export const HomePage: FunctionComponent<{ startWorkingOn: (path: string) => voi
                     <TextField
                         className="input-start"
                         defaultValue={startPath}
-                        onChange={(e) => handleChangeDebounced(e.target.value)}
+                        onChange={e => handleChangeDebounced(e.target.value)}
+                        onKeyUp={handleKeyDown}
                         label="Dossier à classer"
                         placeholder="Chemin complet du dossier source"
                         fullWidth
-                        color={checked ? 'primary' : 'secondary'}
+                        color={startPathChecked ? 'primary' : 'secondary'}
                         InputProps={{
                             endAdornment: <InputAdornment position="end">
                                 <CheckedIcon />
@@ -51,11 +58,11 @@ export const HomePage: FunctionComponent<{ startWorkingOn: (path: string) => voi
                         }}>
                     </TextField>
 
-                    {checked &&
+                    {startPathChecked &&
                         <div className="start-button">
                             <Fade in>
                                 <Button
-                                    onClick={onClickStart}
+                                    onClick={start}
                                     variant="contained"
                                     color="primary"
                                     endIcon={<Send />}>
@@ -65,7 +72,6 @@ export const HomePage: FunctionComponent<{ startWorkingOn: (path: string) => voi
                         </div>}
                 </div>
             </Zoom>
-
         </section>
     )
 };
