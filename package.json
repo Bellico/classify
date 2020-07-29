@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/Bellico/classify#readme",
   "dependencies": {
-    "concurrently": "^5.1.0"
+    "concurrently": "^5.2.0"
   }
 }
